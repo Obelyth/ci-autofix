@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 400" width="1280" height="400" role="img" aria-label="CI Auto-Fix — fixes failing CI, honestly">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#12100e"/>
+      <stop offset="55%" stop-color="#1b1714"/>
+      <stop offset="100%" stop-color="#241c17"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#d97757"/>
+      <stop offset="100%" stop-color="#e9a184"/>
+    </linearGradient>
+    <linearGradient id="fade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#d97757" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#d97757" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1280" height="400" fill="url(#bg)"/>
+
+  <!-- faint grid, like a CI matrix -->
+  <g stroke="#ffffff" stroke-opacity="0.035">
+    <path d="M0 100H1280M0 200H1280M0 300H1280"/>
+    <path d="M160 0V400M320 0V400M480 0V400M640 0V400M800 0V400M960 0V400M1120 0V400"/>
+  </g>
+
+  <!-- pipeline: red run, then green -->
+  <g transform="translate(96,300)">
+    <line x1="0" y1="0" x2="470" y2="0" stroke="#3a2b26" stroke-width="3"/>
+    <circle cx="0"   cy="0" r="9" fill="#2f2320" stroke="#e0654f" stroke-width="3"/>
+    <circle cx="118" cy="0" r="9" fill="#2f2320" stroke="#e0654f" stroke-width="3"/>
+    <circle cx="236" cy="0" r="9" fill="#d97757" stroke="#d97757" stroke-width="3"/>
+    <circle cx="354" cy="0" r="9" fill="#2f2f24" stroke="#5fa96a" stroke-width="3"/>
+    <circle cx="472" cy="0" r="9" fill="#5fa96a" stroke="#5fa96a" stroke-width="3"/>
+    <text x="0"   y="34" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="14" fill="#8d7b72">push</text>
+    <text x="100" y="34" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="14" fill="#c96a52">CI red</text>
+    <text x="206" y="34" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="14" fill="#d97757">diagnose</text>
+    <text x="322" y="34" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="14" fill="#8d7b72">verify</text>
+    <text x="448" y="34" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="14" fill="#5fa96a">green</text>
+  </g>
+
+  <text x="96" y="150" font-family="ui-sans-serif,-apple-system,Segoe UI,Inter,Helvetica,Arial,sans-serif" font-size="82" font-weight="700" fill="#f5efe9" letter-spacing="-2">CI Auto-Fix</text>
+  <rect x="96" y="176" width="360" height="3" fill="url(#fade)"/>
+  <text x="96" y="224" font-family="ui-sans-serif,-apple-system,Segoe UI,Inter,Helvetica,Arial,sans-serif" font-size="26" fill="#b9a79c">Fixes failing CI. Won&#8217;t cheat to do it.</text>
+
+  <!-- the guard, stated as the differentiator -->
+  <g transform="translate(760,104)">
+    <rect x="0" y="0" width="424" height="196" rx="14" fill="#0f0d0c" fill-opacity="0.55" stroke="#3a2b26"/>
+    <text x="26" y="42" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="15" fill="#6f635c">honesty-guard.sh</text>
+    <g font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="15">
+      <text x="26" y="78"  fill="#c96a52">✗</text><text x="52" y="78"  fill="#a2938b">delete the failing test</text>
+      <text x="26" y="108" fill="#c96a52">✗</text><text x="52" y="108" fill="#a2938b">continue-on-error: true</text>
+      <text x="26" y="138" fill="#c96a52">✗</text><text x="52" y="138" fill="#a2938b">force push</text>
+      <text x="26" y="168" fill="#5fa96a">✓</text><text x="52" y="168" fill="#d8cabf">fix the actual cause</text>
+    </g>
+  </g>
+</svg>

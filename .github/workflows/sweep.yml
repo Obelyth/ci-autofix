@@ -1,0 +1,59 @@
+name: Install sweep
+
+# Makes sure every configured account's repos have the CI Auto-Fix caller,
+# including repos created after the first rollout. A project template covers new
+# projects started from it; this covers everything else.
+#
+# It only adds the caller to repos that do not have it. Refreshing the watched
+# workflow list on existing repos is deliberate: run ./install.sh by hand.
+
+on:
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Report what would change without changing anything"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install the caller where it is missing
+        env:
+          GH_TOKEN: ${{ secrets.CI_AUTOFIX_TOKEN }}
+          # config.sh is gitignored, so CI reads the same values from repository
+          # variables. None of these are secrets - they are account identifiers.
+          CI_AUTOFIX_OWNERS: ${{ vars.CI_AUTOFIX_OWNERS }}
+          ANTHROPIC_ORG_ID: ${{ vars.ANTHROPIC_ORG_ID }}
+          ANTHROPIC_SERVICE_ACCOUNT_ID: ${{ vars.ANTHROPIC_SERVICE_ACCOUNT_ID }}
+          ANTHROPIC_WORKSPACE_ID: ${{ vars.ANTHROPIC_WORKSPACE_ID }}
+          CI_AUTOFIX_FEDERATION_RULES: ${{ vars.CI_AUTOFIX_FEDERATION_RULES }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::error::CI_AUTOFIX_TOKEN is not set, so the sweep cannot read both accounts."
+            exit 1
+          fi
+          # A scheduled run installs for real. A manual run defaults to dry so
+          # nobody sets 31 repos moving by clicking the button to see what it does.
+          args=(--only-missing)
+          if [ "${{ inputs.dry_run }}" = "true" ]; then args+=(--dry-run); fi
+          ./install.sh "${args[@]}" | tee "$RUNNER_TEMP/sweep.log"
+
+      - name: Report
+        if: always()
+        run: |
+          {
+            echo "## Install sweep"
+            echo
+            echo '```'
+            cat "$RUNNER_TEMP/sweep.log" 2>/dev/null || echo "no output"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

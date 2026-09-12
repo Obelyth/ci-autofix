@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Shell scripts are valid
+        run: |
+          for f in scripts/*.sh install.sh tests/*.sh; do
+            bash -n "$f" || exit 1
+          done
+
+      - name: Shellcheck
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
+          shellcheck -S warning scripts/*.sh install.sh
+
+      - name: Workflows are valid
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash \
+            | bash -s -- latest "$RUNNER_TEMP"
+          # actionlint carries a snapshot of popular actions' inputs compiled
+          # into the binary. Its copy of claude-code-action predates workload
+          # identity federation, so it reports the four anthropic_* federation
+          # inputs as undefined. They exist on the v1 tag - verified against
+          # the action's own action.yml - so this one check is ignored rather
+          # than the whole action.
+          "$RUNNER_TEMP/actionlint" -color \
+            -ignore 'input "anthropic_(federation_rule_id|organization_id|service_account_id|workspace_id)" is not defined in action'
+
+      - name: The honesty guard does its job
+        run: bash tests/guard_test.sh
