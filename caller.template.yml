@@ -17,6 +17,16 @@ on:
     workflows: __WORKFLOWS__
     types: [completed]
 
+# One branch, one fixer at a time. A push that fails several watched workflows
+# emits one workflow_run event each, and without this they all start at once,
+# every one of them reading the attempt count before any of the others has
+# recorded itself - so the retry cap is bypassed and the same failure is
+# diagnosed several times in parallel. Queueing rather than cancelling means the
+# second run starts after the first has finished and sees the real count.
+concurrency:
+  group: ci-autofix-${{ github.event.workflow_run.head_branch }}
+  cancel-in-progress: false
+
 permissions:
   contents: write
   pull-requests: write
