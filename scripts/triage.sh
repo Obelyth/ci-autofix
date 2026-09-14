@@ -40,6 +40,18 @@ for p in "${prot[@]}"; do
 done
 out protected "$protected"
 
+# 2b. Has the branch already moved past the commit that failed?
+#
+#     A run can sit queued while someone pushes a fix, or while an earlier
+#     attempt lands one. By the time it starts, the failure it was called about
+#     may not exist any more - and diagnosing it means reading a CI log for one
+#     commit against a working tree at another, which is how you get a "fix" for
+#     a problem that is already gone.
+head_now="$(git rev-parse HEAD)"
+if [[ -n "${FAILED_SHA:-}" && "$FAILED_SHA" != "$head_now" ]]; then
+  stop "The branch moved on. CI failed at \`${FAILED_SHA:0:8}\` but \`$BRANCH\` is now at \`${head_now:0:8}\`, so that failure is already history."
+fi
+
 # 3. Which attempt is this? Count auto-fix commits sitting consecutively at the
 #    tip of the branch. A human commit on top resets the count to zero, so a
 #    branch someone is actively working on always gets a fresh budget.

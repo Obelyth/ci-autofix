@@ -123,6 +123,7 @@ jobs:
           SKIP_BRANCHES: ${{ inputs.skip_branches }}
           SKIP_DEPENDABOT: ${{ inputs.skip_dependabot }}
           REPO: ${{ github.repository }}
+          FAILED_SHA: ${{ github.event.workflow_run.head_sha }}
           HAS_CLAUDE_CREDENTIAL: ${{ (secrets.CLAUDE_CODE_OAUTH_TOKEN != '' || secrets.ANTHROPIC_API_KEY != '' || inputs.anthropic_federation_rule_id != '') && 'true' || 'false' }}
         run: bash .ci-autofix/scripts/triage.sh
 
@@ -246,6 +247,7 @@ jobs:
         env:
           TEST_COMMAND: ${{ inputs.test_command }}
           SETUP_COMMAND: ${{ inputs.setup_command }}
+          BASE_SHA: ${{ steps.base.outputs.sha }}
         run: bash .ci-autofix/scripts/verify.sh
 
       - name: Write the commit message
